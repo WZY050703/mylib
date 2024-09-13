@@ -1,0 +1,131 @@
+int Str_Len(char *ch);
+int Str_Find(char *ch, char *sign, int beg);
+bool If_Str_Equ(char *ch1, char *ch2);
+bool If_Str_Int(char *ch);
+bool If_Str_Letter(char *ch);
+char **Input_Cut(char *line, int &len);
+
+int Str_Len(char *ch)
+{
+    int i = 0;
+    while (*(ch + i) != '\0')
+    {
+        i++;
+    }
+    return i;
+}
+
+int Str_Find(char *ch, char *sign, int beg)
+{
+
+    int len_ch = Str_Len(ch);
+    if (beg >= len_ch) // 开始超过结尾
+        return -3;
+    int point = -1, len_sign = Str_Len(sign);
+    if (len_sign <= 0) // 没目标
+        return -2;
+    for (int i = beg; i < len_ch; i++)
+    {
+        if (ch[i] == sign[0])
+        {
+            bool issign = true;
+            for (int j = 0; j < len_sign; j++)
+            {
+                if (i + j >= len_ch || ch[i + j] != sign[j])
+                {
+                    issign = false;
+                    break;
+                }
+            }
+            if (issign)
+            {
+                point = i;
+                break;
+            }
+        }
+    }
+    return point;
+}
+
+bool If_Str_Equ(char *ch1, char *ch2)
+{
+    if (Str_Len(ch1) != Str_Len(ch2))
+        return false;
+    int len = Str_Len(ch1);
+    for (int i = 0; i < len; i++)
+    {
+        if (ch1[i] != ch2[i])
+            return false;
+    }
+    return true;
+}
+
+bool If_Str_Int(char *ch)
+{
+    int len = Str_Len(ch);
+    for (int i = 0; i < len; i++)
+    {
+        if (!(48 <= ch[i] && ch[i] <= 57))
+            return false;
+    }
+    return true;
+}
+
+bool If_Str_Letter(char *ch)
+{
+    int len = Str_Len(ch);
+    for (int i = 0; i < len; i++)
+    {
+        if (!((65 <= ch[i] && ch[i] <= 90) || (97 <= ch[i] && ch[i] <= 122)))
+            return false;
+    }
+    return true;
+}
+
+char **Input_Cut(char *line, int &cellslen)
+{
+    bool lchar = false;
+    char nowch = '\0';
+    int CellLen = 0, BeginBit = 0;
+    int len = Str_Len(line), CellNum = 0;
+
+    for (int i = 0; i <= len; i++)
+    {
+        nowch = *(line + i);
+        if ((';' == nowch && !lchar) || '\0' == nowch)
+            CellNum++;
+        if ('\\' == nowch) // 判断转义
+            lchar = true;
+        else
+            lchar = false;
+    }
+
+    char **Cells = new char *[CellNum];
+    cellslen = CellNum; // 把长度拿到外面去
+    int NowCellNum = 0;
+    lchar = false;
+    for (int i = 0; i <= len; i++)
+    {
+        nowch = *(line + i);
+        if ((';' == nowch && !lchar) || '\0' == nowch)
+        {
+            char *cell = new char[CellLen + 1];
+            for (int j = 0; j < CellLen; j++)
+            {
+                cell[j] = line[BeginBit + j];
+            }
+            cell[CellLen] = '\0';
+            Cells[NowCellNum] = cell;
+            NowCellNum++;
+            CellLen = 0;
+            BeginBit = i + 1;
+        }
+        else
+            CellLen++;
+        if ('\\' == nowch) // 判断转义
+            lchar = true;
+        else
+            lchar = false;
+    }
+    return Cells;
+}

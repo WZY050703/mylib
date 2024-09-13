@@ -1,0 +1,89 @@
+#include <iostream>
+#include "mylist"
+
+#define COUT std::cout
+#define ENDL std::endl
+
+template <class T>
+class myqueue
+{
+private:
+    mylist<T> *begin, *now;
+    int lenth;
+    bool have_backup;
+
+public:
+    myqueue()
+    {
+        begin = nullptr;
+        now = nullptr;
+        lenth = 0;
+        have_backup = false;
+    }
+    bool push(T elem)
+    {
+        if (0 == lenth)
+        {
+            begin = new mylist<T>(elem);
+            now = begin;
+        }
+        else
+        {
+            mylist<T> *tmp = new mylist<T>(elem);
+            now->next = tmp;
+            now = tmp;
+        }
+        lenth++;
+        return true;
+    }
+    bool pop()
+    {
+        if (0 == lenth)
+        {
+            return false;
+        }
+        mylist<T> *last = begin;
+        begin = begin->next;
+        delete last;
+        lenth--;
+        if (0 == lenth)
+        {
+            now = nullptr;
+        }
+        return true;
+    }
+    void inqueue()
+    {
+        for (mylist<T> *i = begin; i != nullptr; i = i->next)
+        {
+            std::cout << i->obj;
+        }
+    }
+    int len()
+    {
+        return lenth;
+    }
+    ~myqueue()
+    {
+        if (!have_backup)
+        {
+            if (lenth > 0)
+            {
+                mylist<T> *last = begin;
+                for (mylist<T> *i = begin->next; i != nullptr; i = i->next)
+                {
+                    delete last;
+                    last = i;
+                }
+                delete last;
+            }
+        }
+    }
+    myqueue(myqueue &&other)
+    {
+        other.have_backup = true;
+        lenth = other.lenth;
+        begin = other.begin;
+        now = other.now;
+    }
+};
