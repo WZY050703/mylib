@@ -9,15 +9,3 @@ struct mylist
         next = nullptr;
     }
 };
-
-/*int main()
-{
-    mylist<int> a(1),b(2),c(3);
-    a.next=&b;
-    b.next=&c;
-    for(mylist<int>* i=&a;i!=nullptr;i=i->next)
-    {
-        std::cout<<i->obj;
-    }
-    return 0;
-}*/

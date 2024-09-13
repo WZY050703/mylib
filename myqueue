@@ -10,7 +10,6 @@ class myqueue
 private:
     mylist<T> *begin, *now;
     int lenth;
-    bool have_backup;
 
 public:
     myqueue()
@@ -18,39 +17,63 @@ public:
         begin = nullptr;
         now = nullptr;
         lenth = 0;
-        have_backup = false;
     }
     bool push(T elem)
     {
         if (0 == lenth)
         {
-            begin = new mylist<T>(elem);
-            now = begin;
+            try
+            {
+                begin = new mylist<T>(elem);
+                now = begin;
+            }
+            catch (const std::bad_alloc &e)//防止没有内存
+            {
+                std::cerr << e.what() << " ->in myqueue.push" << '\n';
+            }
+            catch (...)
+            {
+                std::cerr << "Unkonw ERR in myqueue.push" << '\n';
+            }
         }
         else
         {
-            mylist<T> *tmp = new mylist<T>(elem);
-            now->next = tmp;
-            now = tmp;
+            try
+            {
+                mylist<T> *tmp = new mylist<T>(elem);
+                now->next = tmp;
+                now = tmp;
+            }
+            catch (const std::bad_alloc &e)
+            {
+                std::cerr << e.what() << " ->in myqueue.push" << '\n';
+            }
+            catch (...)
+            {
+                std::cerr << "Unkonw ERR in myqueue.push" << '\n';
+            }
         }
         lenth++;
         return true;
     }
-    bool pop()
+    T pop()
     {
         if (0 == lenth)
         {
-            return false;
+            begin = nullptr;
+            return T(0);
         }
         mylist<T> *last = begin;
+        T re = begin->obj;
         begin = begin->next;
         delete last;
         lenth--;
         if (0 == lenth)
         {
+            begin = nullptr;
             now = nullptr;
         }
-        return true;
+        return re;
     }
     void inqueue()
     {
@@ -65,25 +88,24 @@ public:
     }
     ~myqueue()
     {
-        if (!have_backup)
+        if (lenth > 0)
         {
-            if (lenth > 0)
+            mylist<T> *last = begin;
+            for (mylist<T> *i = begin->next; i != nullptr; i = i->next)
             {
-                mylist<T> *last = begin;
-                for (mylist<T> *i = begin->next; i != nullptr; i = i->next)
-                {
-                    delete last;
-                    last = i;
-                }
                 delete last;
+                last = i;
             }
+            delete last;
         }
     }
-    myqueue(myqueue &&other)
+    myqueue(myqueue &&other) // 移动时复制指针
     {
-        other.have_backup = true;
         lenth = other.lenth;
         begin = other.begin;
         now = other.now;
+        other.begin = nullptr; // 交换控制权，保持唯一性
+        other.now = nullptr;
+        other.lenth = 0;
     }
 };

@@ -38,8 +38,8 @@ public:
     void __DEBUG();
     int save(char *line);
     int delet(char *key);
-    char *find(char *sign);            // 记得delete[]
-    char *find(char *sign, int point); // 从某点开始
+    myqueue<char> find(char *sign);
+    myqueue<char> find(char *sign, int point); // 从某点开始
     myqueue<char *> find_all(char *sign);
     int list();
     int list(int point); // 从某点开始
@@ -165,9 +165,11 @@ int mylib::delet(char *key)
     return 0;
 }
 
-char *mylib::find(char *sign) // 记得delete[]
+myqueue<char> mylib::find(char *sign)
 {
-    char *rene = new char[3]{'-', '1', '\0'};
+    myqueue<char> rene;
+    rene.push('-');
+    rene.push('1');
     f.open(File_Name, std::ios::in);
     if (!f)
     {
@@ -196,16 +198,14 @@ char *mylib::find(char *sign) // 记得delete[]
         }
         if (pointB >= 0)
         {
-            char *restr = new char[pointE - pointB](); // 初始化空
-            int jre = 0;
+            myqueue<char> restr;
             for (int i = pointB + 1; i < pointE; i++)
             {
                 if (file_data[i] == ASEPARATOR)
-                    restr[jre++] = ';';
+                    restr.push(';');
                 else
-                    restr[jre++] = file_data[i];
+                    restr.push(file_data[i]);
             }
-            restr[jre] = '\0';
             return restr;
         }
         else
@@ -215,9 +215,11 @@ char *mylib::find(char *sign) // 记得delete[]
         return rene;
 }
 
-char *mylib::find(char *sign, int point) // 从某点开始
+myqueue<char> mylib::find(char *sign, int point) // 从某点开始
 {
-    char *rene = new char[3]{'-', '1', '\0'};
+    myqueue<char> rene;
+    rene.push('-');
+    rene.push('1');
     f.open(File_Name, std::ios::in);
     if (!f)
     {
@@ -251,16 +253,14 @@ char *mylib::find(char *sign, int point) // 从某点开始
         }
         if (pointB >= 0)
         {
-            char *restr = new char[pointE - pointB](); // 初始化空
-            int jre = 0;
+            myqueue<char> restr;
             for (int i = pointB + 1; i < pointE; i++)
             {
                 if (file_data[i] == ASEPARATOR)
-                    restr[jre++] = ';';
+                    restr.push(';');
                 else
-                    restr[jre++] = file_data[i];
+                    restr.push(file_data[i]);
             }
-            restr[jre] = '\0';
             return restr;
         }
         else
@@ -290,9 +290,9 @@ myqueue<char *> mylib::find_all(char *sign)
     Decryption(file_data); // 解密
     int pointK = 0;
     myqueue<char *> restrs;
-    while (pointK <= file_size && pointK>=0)
+    while (pointK <= file_size && pointK >= 0)
     {
-        pointK = Str_Find(file_data, sign, pointK+1); // 找到点
+        pointK = Str_Find(file_data, sign, pointK + 1); // 找到点
         if (pointK >= 0)
         {
             char line_end[3] = {ASEPARATOR, BSEPARATOR, '\0'};
@@ -449,25 +449,9 @@ int mylib ::Decryption(char *str)
 
 int main()
 {
-    char fil[] = "testlib", tab[] = "ID;int;str;str;time", line[] = "12;3lllllllll4;5ko-", tmp[] = "ko";
-    mylib liba(fil, tab, no);
-    //liba.save(line);
-    //liba.save(line);
-    
-    myqueue<char *> re = liba.find_all(tmp);
-    re.inqueue();
-    
-    //  liba.delet(tmp);
-    /*liba.list(10);
-    {
-        char *tt = liba.find(tmp, 10);
-        std::cout << tt;
-        delete[] tt;
-    }*/
-    // liba.delet(fil);
-
-    //      liba.__DEBUG();
-    //      char a[4]="456",b[4]="asd";
-    //      std::cout<<If_Str_Int(a)<<","<<If_Str_Int(b);
+    // char fil[] = "testlib", tab[] = "ID;int;str;str;time", line[] = "12;3lllllllll4;5ko-", tmp[] = "ko";
+    // mylib liba(fil, tab, no);
+    // liba.save(line);
+    // liba.save(line);
     return 0;
 }
