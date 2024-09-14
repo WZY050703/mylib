@@ -16,7 +16,8 @@ char NAMESTRS[4][5] = {"ID", "int", "str", "time"}; // 防止const不准转换
 enum SAFEMODLE
 {
     no = 0,
-    Caesar = 1
+    Caesar = 1,
+    user = 2
 };
 
 class mylib
@@ -27,6 +28,7 @@ private:
     int Header_Len = 0;
     char **Table_Header;
     SAFEMODLE Safe_Modle;
+    void (*DEfuncp)(char *);
     void IDGet_Time(char (&ID)[6]);
     int Encryption(char *str); // 加密
     int Decryption(char *str); // 解密
@@ -43,6 +45,7 @@ public:
     myqueue<char *> find_all(char *sign);
     int list();
     int list(int point); // 从某点开始
+    void setDE(void (*DEfuncp)(char *));
 };
 
 mylib::mylib(char *file_name, char *table_header, SAFEMODLE sm)
@@ -56,6 +59,7 @@ mylib::mylib(char *file_name, char *table_header, SAFEMODLE sm)
     File_Name = file_name;
     Table_Header = Input_Cut(table_header, Header_Len);
     Safe_Modle = sm;
+    DEfuncp = nullptr;
 }
 
 bool mylib::if_file_exist(char *file_name)
@@ -387,6 +391,11 @@ int mylib::list(int point) // 从某点开始
     return 0;
 }
 
+void mylib::setDE(void (*DEfuncpx)(char *))
+{
+    DEfuncp = DEfuncpx;
+}
+
 mylib::~mylib()
 {
     for (int i = 0; i < Header_Len; i++) // 回收内存
@@ -426,6 +435,17 @@ int mylib::Encryption(char *str)
         }
         return 0;
     }
+    if (Safe_Modle == user)
+    {
+        if (DEfuncp == nullptr)
+            COUT << "Encryption ERR:No encryption function input!\n";
+        else
+        {
+            DEfuncp(str);
+            return 0;
+        }
+    }
+
     return -1;
 }
 
@@ -444,14 +464,36 @@ int mylib ::Decryption(char *str)
         }
         return 0;
     }
+    if (Safe_Modle == user)
+    {
+        if (DEfuncp == nullptr)
+            COUT << "Dncryption ERR:No dncryption function input!\n";
+        else
+        {
+            DEfuncp(str);
+            return 0;
+        }
+    }
     return -1;
+}
+
+/*void a(char *str)
+{
+    int i = 0;
+    while ('\0' != str[i])
+    {
+        if (str[i] != ASEPARATOR && str[i] != BSEPARATOR && str[i] != PLACEHOLDING)
+            str[i] = str[i] - 3;
+        i++;
+    }
 }
 
 int main()
 {
-    // char fil[] = "testlib", tab[] = "ID;int;str;str;time", line[] = "12;3lllllllll4;5ko-", tmp[] = "ko";
-    // mylib liba(fil, tab, no);
-    // liba.save(line);
+    char fil[] = "testlib", tab[] = "ID;int;str;str;time", line[] = "12;3lllllllll4;5ko-", tmp[] = "ko";
+    mylib liba(fil, tab, user);
+    liba.setDE(&a);
+    liba.save(line);
     // liba.save(line);
     return 0;
-}
+}*/
